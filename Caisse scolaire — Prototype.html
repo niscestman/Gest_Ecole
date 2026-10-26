@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Caisse scolaire — Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6f5;--surface:#fff;--ink:#12261f;--mute:#5d6f68;--line:#dde4e1;--brand:#0b5d4b;--brand-ink:#fff;--in:#0b7a5c;--out:#b4372b;--warn:#a76200;--warnbg:#fdf0d8;--okbg:#dff3ea;--badbg:#fbe3df;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1714;--surface:#16231f;--ink:#e6efeb;--mute:#93a69e;--line:#27382f;--brand:#3fb594;--brand-ink:#06201a;--in:#4cc9a3;--out:#f08b7e;--warn:#f0b455;--warnbg:#3a2c10;--okbg:#12362b;--badbg:#3d1d19}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Public Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+nav{background:var(--brand);color:var(--brand-ink);padding:20px 12px;position:sticky;top:0;height:100vh}
+nav h1{font-size:16px;margin:0 8px 2px;font-weight:700}nav p{margin:0 8px 22px;font-size:12px;opacity:.75}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;font-weight:500;padding:10px 12px;border-radius:8px;cursor:pointer;opacity:.8}
+nav button:hover{opacity:1;background:rgba(255,255,255,.1)}nav button[aria-current=page]{background:rgba(255,255,255,.18);opacity:1;font-weight:700}
+main{padding:28px 32px;max-width:1600px;width:100%;min-width:0}
+h2{font-size:22px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 22px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi span{font-size:13px;color:var(--mute)}.kpi b{display:block;font-size:22px;margin-top:2px}
+.kpi.main{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}.kpi.main span{color:inherit;opacity:.8}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h3{margin:0 0 12px;font-size:15px}
+.cols{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--mute);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}tr:last-child td{border-bottom:0}
+.r{text-align:right}.in{color:var(--in);font-weight:600}.out{color:var(--out);font-weight:600}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.b-ok{background:var(--okbg);color:var(--in)}.b-late{background:var(--badbg);color:var(--out)}.b-up{background:var(--warnbg);color:var(--warn)}
+.btn{font:inherit;font-weight:600;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:none;color:var(--brand)}.btn.sm{padding:4px 10px;font-size:13px}
+.btn:focus-visible,nav button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.seg button{font:inherit;background:var(--surface);color:var(--ink);border:0;padding:6px 14px;cursor:pointer}.seg button[aria-pressed=true]{background:var(--brand);color:var(--brand-ink)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--brand)}
+.row{display:grid;grid-template-columns:110px 1fr 120px;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+dialog{border:1px solid var(--line);border-radius:12px;padding:20px;background:var(--surface);color:var(--ink);width:min(420px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 3px}
+input,select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;display:none;z-index:9}
+.empty{color:var(--mute);padding:14px 0}
+nav button{display:flex;align-items:center;gap:10px}.kpi svg,.btn svg{vertical-align:-3px;margin-right:6px}
+.invh{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:12px}
+.sig{display:flex;justify-content:space-between;margin-top:46px;font-size:13px}.sig span{border-top:1px solid var(--ink);padding-top:4px;min-width:42%;text-align:center}
+@media print{body *{visibility:hidden}#dlgInv,#dlgInv *{visibility:visible}#dlgInv{position:absolute;top:0;left:0;margin:0;width:100%;border:0;--ink:#000;--line:#bbb;--surface:#fff;--mute:#444;color:#000;background:#fff}.noprint{display:none!important}}
+@media (max-width:1100px){.cols{grid-template-columns:1fr}.app{grid-template-columns:200px minmax(0,1fr)}main{padding:22px 20px}}
+@media (max-width:760px){.app{grid-template-columns:minmax(0,1fr)}h2{font-size:19px}nav{position:static;height:auto;display:flex;gap:4px;overflow-x:auto;padding:12px}nav h1,nav p{display:none}nav button{white-space:nowrap;width:auto}main{padding:18px 14px}.cols{grid-template-columns:1fr}.row{grid-template-columns:80px 1fr 100px}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav>
+  <h1 style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Caisse scolaire</h1><p>Année 2026–2027 · Prototype</p>
+  <button data-v="dash" aria-current="page">Tableau de bord</button>
+  <button data-v="caisse">Caisse</button>
+  <button data-v="eleves">Élèves</button>
+  <button data-v="fees">Scolarité</button>
+  <button data-v="services">Cantine et transport</button>
+  <button data-v="rap">Rapports</button>
+  <button data-v="tarifs">Tarifs</button>
+</nav>
+<main id="main"></main>
+</div>
+
+<dialog id="dlgTx"><form method="dialog" id="fTx">
+  <h3 style="margin:0">Nouvelle opération</h3>
+  <label for="tType">Type</label><select id="tType"><option value="in">Entrée (recette)</option><option value="out">Sortie (dépense)</option></select>
+  <label for="tCat">Catégorie</label><select id="tCat"></select>
+  <div id="wEleve"><label for="tEleve">Élève qui paie</label><select id="tEleve"></select><p id="tHint" class="sub" style="margin:4px 0 0;font-size:13px"></p></div>
+  <div id="wMois" style="display:none"><label>Mois couverts</label><div id="tMois" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>
+  <div id="wLab"><label for="tLab">Libellé</label><input id="tLab" placeholder="Ex. Facture SODECI"></div>
+  <label for="tAmt">Montant (FCFA)</label><input id="tAmt" type="number" min="1" required>
+  <label for="tMode">Mode de paiement</label><select id="tMode"><option>Espèces</option><option>Mobile Money</option><option>Virement</option><option>Chèque</option></select>
+  <div class="acts"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok">Enregistrer l’opération</button></div>
+</form></dialog>
+
+<dialog id="dlgPay"><form method="dialog" id="fPay">
+  <h3 style="margin:0" id="pTitle">Encaisser</h3>
+  <p class="sub" id="pInfo" style="margin:6px 0 0"></p>
+  <label for="pAmt">Montant reçu (FCFA)</label><input id="pAmt" type="number" min="1" required>
+  <label for="pMode">Mode de paiement</label><select id="pMode"><option>Espèces</option><option>Mobile Money</option><option>Virement</option><option>Chèque</option></select>
+  <div class="acts"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok">Encaisser le paiement</button></div>
+</form></dialog>
+<dialog id="dlgEleve"><form method="dialog" id="fEl">
+  <h3 style="margin:0">Inscrire un élève</h3>
+  <label for="eNom">Nom et prénoms</label><input id="eNom" required>
+  <label for="eCl">Classe</label><select id="eCl"><option>6e</option><option>3e</option><option>Tle</option></select>
+  <label for="eTut">Tuteur</label><input id="eTut" required>
+  <label for="eTel">Téléphone du tuteur</label><input id="eTel" type="tel" required>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="eCa" style="width:auto"> Cantine</label>
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="eTr" style="width:auto"> Transport</label>
+  <div class="acts"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn" value="ok">Inscrire l’élève</button></div>
+</form></dialog>
+<dialog id="dlgInv" style="width:min(640px,94vw)"><div id="inv"></div><div class="acts noprint"><button type="button" class="btn ghost" data-close>Fermer</button><button type="button" class="btn" id="btnPrint">Imprimer la facture</button></div></dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const TODAY='2026-10-25', DUE_NOW=0.4;
+const FEES={'6e':250000,'3e':300000,'Tle':400000};
+const CATS_IN=['Scolarité','Inscription','Cantine','Transport','Autres recettes'];
+const CATS_OUT=['Salaires','Fournitures','Électricité et eau','Maintenance','Sorties pédagogiques','Autres dépenses'];
+const MONTHS=['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Juin'];
+const raw=[['Koffi Aya','6e',[['2026-09-10',150000]]],['Traoré Ibrahim','6e',[['2026-09-12',250000]]],['Yao Jean-Marc','6e',[]],['Diallo Fatou','6e',[['2026-09-20',60000]]],
+['Kouassi Mariam','3e',[['2026-09-08',120000],['2026-10-05',60000]]],['N’Guessan Paul','3e',[['2026-09-15',300000]]],['Bamba Salif','3e',[]],['Konan Estelle','3e',[['2026-10-02',80000]]],
+['Ouattara Awa','Tle',[['2026-09-09',160000],['2026-10-10',100000]]],['Soro Kévin','Tle',[['2026-09-18',100000]]],['Gnahoré Linda','Tle',[]],['Coulibaly Yacouba','Tle',[['2026-09-11',400000]]]];
+let students=raw.map((r,i)=>({id:i+1,nom:r[0],classe:r[1],pays:r[2],mat:'2026-'+String(i+1).padStart(3,'0'),tuteur:'Famille '+r[0].split(' ')[0],tel:'07 '+(10+i*3)+' '+(40+i*2)+' '+(11+i*5)+' 0'+i%10,cantine:i%2===0,transport:i%3===0}));
+let q='',cf='all',sel=null;
+let tx=[],tid=1;
+const add=(date,type,cat,label,amount,mode,eleve,mois)=>tx.push({id:tid++,date,type,cat,label,amount,mode,eleve,mois});
+students.forEach(s=>s.pays.forEach(p=>add(p[0],'in','Scolarité','Scolarité — '+s.nom,p[1],'Espèces',s.id)));
+[
+['2026-09-28','out','Salaires','Salaires du personnel — septembre',920000,'Virement'],['2026-09-16','out','Fournitures','Craies, cahiers et registres',85000,'Espèces'],['2026-10-03','out','Électricité et eau','Factures CIE et SODECI',64000,'Espèces'],
+['2026-10-12','out','Maintenance','Réparation de la toiture, bloc B',150000,'Espèces'],['2026-10-20','out','Sorties pédagogiques','Visite du musée des Civilisations',55000,'Mobile Money']].forEach(a=>add(...a));
+const TAR={cantine:15000,transport:20000,inscription:50000},DUEM=['2026-09','2026-10'],MK=['2026-09','2026-10','2026-11','2026-12','2027-01','2027-02','2027-03','2027-04','2027-05','2027-06'],SK=[['cantine','Cantine'],['transport','Transport']];
+const pm=(s,c)=>new Set(tx.filter(x=>x.eleve===s.id&&x.cat===c).flatMap(x=>x.mois||[]));
+const svLate=(s,k,c)=>s[k]?DUEM.filter(m=>!pm(s,c).has(m)):[];
+const svDue=s=>sum(SK.map(([k,c])=>svLate(s,k,c).length*TAR[k]));
+const insPaid=s=>tx.some(x=>x.eleve===s.id&&x.cat==='Inscription');
+students.forEach((s,i)=>{if(i%4!==3)add('2026-09-0'+(1+i%5),'in','Inscription','Inscription — '+s.nom,TAR.inscription,'Espèces',s.id)});
+students.forEach((s,i)=>SK.forEach(([k,c],j)=>{if(!s[k])return;const ms=(i+j)%3===0?[]:(i+j)%2===0?['2026-09']:DUEM;if(ms.length)add(ms.length>1?'2026-10-06':'2026-09-14','in',c,c+' — '+s.nom+' ('+ms.length+' mois)',ms.length*TAR[k],'Mobile Money',s.id,ms)}));
+const F=n=>Math.round(n).toLocaleString('fr-FR')+' F';
+const paid=s=>s.pays.reduce((a,p)=>a+p[1],0);
+const total=s=>FEES[s.classe], due=s=>total(s)*DUE_NOW, late=s=>Math.max(0,due(s)-paid(s)), rest=s=>total(s)-paid(s);
+const status=s=>rest(s)<=0?['Soldé','b-ok']:late(s)>0?['En retard','b-late']:['À jour','b-up'];
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const month=d=>d.slice(0,7);
+const inM=(m,t)=>sum(tx.filter(x=>x.type===t&&month(x.date)===m).map(x=>x.amount));
+const balance=()=>sum(tx.map(x=>x.type==='in'?x.amount:-x.amount));
+const fmtDate=d=>d.slice(8)+'/'+d.slice(5,7)+'/'+d.slice(0,4);
+let view='dash',filter='all',toastT;
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',2400)}
+
+function dash(){
+  const m='2026-10',rec=inM(m,'in'),dep=inM(m,'out'),imp=sum(students.map(late)),att=sum(students.map(due)),enc=sum(students.map(s=>Math.min(paid(s),due(s))));
+  const ym=['2026-09','2026-10','2026-11','2026-12','2027-01','2027-02','2027-03','2027-04','2027-05','2027-06'];
+  const mx=Math.max(1,...ym.map(k=>Math.max(inM(k,'in'),inM(k,'out'))));
+  const bars=ym.map((k,i)=>{const a=inM(k,'in')/mx*120,b=inM(k,'out')/mx*120,x=i*58+14;
+    return `<rect x="${x}" y="${130-a}" width="18" height="${a}" rx="2" fill="var(--in)"/><rect x="${x+20}" y="${130-b}" width="18" height="${b}" rx="2" fill="var(--out)"/><text x="${x+19}" y="148" text-anchor="middle" font-size="11" fill="var(--mute)">${MONTHS[i]}</text>`}).join('');
+  const top=students.filter(s=>late(s)>0).sort((a,b)=>late(b)-late(a)).slice(0,5);
+  const last=[...tx].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5);
+  return `<div class="head"><div><h2>Tableau de bord</h2><p class="sub">Situation au ${fmtDate(TODAY)}</p></div><button class="btn" data-act="newTx">${ic('plus',16)}Nouvelle opération</button></div>
+  <div class="kpis"><div class="kpi main"><span>${ic('caisse',15)}Solde de la caisse</span><b>${F(balance())}</b></div>
+  <div class="kpi"><span>${ic('up',15)}Recettes d’octobre</span><b class="in">${F(rec)}</b></div><div class="kpi"><span>${ic('down',15)}Dépenses d’octobre</span><b class="out">${F(dep)}</b></div>
+  <div class="kpi"><span>${ic('alert',15)}Impayés de scolarité</span><b style="color:var(--out)">${F(imp)}</b></div><div class="kpi"><span>${ic('alert',15)}Impayés cantine et transport</span><b style="color:var(--out)">${F(sum(students.map(svDue)))}</b></div></div>
+  <div class="cols"><div class="panel tw"><h3>Recettes et dépenses par mois</h3><svg viewBox="0 0 590 156" style="width:100%;min-width:480px;height:auto" role="img" aria-label="Recettes (vert) et dépenses (rouge) par mois">${bars}</svg></div>
+  <div class="panel"><h3>Recouvrement de la 1re tranche</h3><b style="font-size:28px">${Math.round(enc/att*100)} %</b><div class="bar" style="margin:8px 0"><i style="width:${enc/att*100}%"></i></div><span class="sub" style="font-size:13px">${F(enc)} encaissés sur ${F(att)} exigibles</span></div></div>
+  <div class="cols"><div class="panel"><h3>Dernières opérations</h3><div class="tw"><table><tbody>${last.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.label}</td><td class="r ${x.type}">${x.type==='in'?'+':'−'}${F(x.amount)}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="panel"><h3>Plus gros retards</h3><table><tbody>${top.map(s=>`<tr><td>${s.nom}<br><small style="color:var(--mute)">${s.classe}</small></td><td class="r out">${F(late(s))}</td></tr>`).join('')}</tbody></table></div></div>`}
+
+function caisse(){
+  const l=tx.filter(x=>filter==='all'||x.type===filter).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  const ein=sum(tx.filter(x=>x.type==='in').map(x=>x.amount)),eout=sum(tx.filter(x=>x.type==='out').map(x=>x.amount));
+  return `<div class="head"><div><h2>Journal de caisse</h2><p class="sub">${F(ein)} d’entrées · ${F(eout)} de sorties · solde ${F(ein-eout)}</p></div><button class="btn" data-act="newTx">${ic('plus',16)}Nouvelle opération</button></div>
+  <div class="seg" role="group" aria-label="Filtrer">${[['all','Tout'],['in','Entrées'],['out','Sorties']].map(f=>`<button data-f="${f[0]}" aria-pressed="${filter===f[0]}">${f[1]}</button>`).join('')}</div>
+  <div class="panel tw"><table><thead><tr><th>Date</th><th>Libellé</th><th>Catégorie</th><th>Mode</th><th class="r">Montant</th><th></th></tr></thead><tbody>${l.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.label}</td><td>${x.cat}</td><td>${x.mode}</td><td class="r ${x.type}">${x.type==='in'?'+':'−'}${F(x.amount)}</td><td class="r"><button class="btn ghost sm" data-inv="${x.id}">${ic('receipt',14)}${x.type==='in'?'Facture':'Bon de sortie'}</button></td></tr>`).join('')}</tbody></table></div>`}
+
+function fees(){
+  const imp=sum(students.map(late)),n=students.filter(s=>late(s)>0).length;
+  return `<h2>Scolarité</h2><p class="sub">${n} élève${n>1?'s':''} en retard · ${F(imp)} d’impayés exigibles (1re tranche : 40 % du montant annuel)</p>
+  <div class="panel tw"><table><thead><tr><th>Élève</th><th>Classe</th><th class="r">Annuel</th><th class="r">Payé</th><th class="r">Retard</th><th>Statut</th><th></th></tr></thead><tbody>
+  ${[...students].sort((a,b)=>late(b)-late(a)).map(s=>{const st=status(s);return `<tr><td>${s.nom}</td><td>${s.classe}</td><td class="r">${F(total(s))}</td><td class="r">${F(paid(s))}</td><td class="r ${late(s)?'out':''}">${late(s)?F(late(s)):'—'}</td><td><span class="badge ${st[1]}">${st[0]}</span></td><td class="r">${rest(s)>0?`<button class="btn sm" data-pay="${s.id}">Encaisser</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`}
+
+function rap(){
+  const cl=Object.keys(FEES).map(c=>{const g=students.filter(s=>s.classe===c),a=sum(g.map(due)),e=sum(g.map(s=>Math.min(paid(s),due(s))));return [c,e,a,a?e/a*100:0]});
+  const cats=[...CATS_OUT].map(c=>[c,sum(tx.filter(x=>x.type==='out'&&x.cat===c).map(x=>x.amount))]).filter(c=>c[1]>0).sort((a,b)=>b[1]-a[1]);
+  const to=sum(cats.map(c=>c[1]));
+  const ci=CATS_IN.map(c=>[c,sum(tx.filter(x=>x.type==='in'&&x.cat===c).map(x=>x.amount))]).filter(c=>c[1]>0).sort((a,b)=>b[1]-a[1]);
+  const ti=sum(ci.map(c=>c[1]));
+  const rows=(a,t,col)=>a.map(c=>`<div class="row"><span>${c[0]}</span><div class="bar"><i style="width:${c[1]/t*100}%;background:${col}"></i></div><span class="r">${F(c[1])}</span></div>`).join('');
+  return `<h2>Rapports financiers</h2><p class="sub">Synthèse depuis la rentrée de septembre 2026</p>
+  <div class="kpis"><div class="kpi"><span>Total des recettes</span><b class="in">${F(ti)}</b></div><div class="kpi"><span>Total des dépenses</span><b class="out">${F(to)}</b></div><div class="kpi main"><span>Résultat net</span><b>${F(ti-to)}</b></div></div>
+  <div class="cols"><div class="panel"><h3>Recettes par catégorie</h3>${rows(ci,ti,'var(--in)')}</div><div class="panel"><h3>Dépenses par catégorie</h3>${rows(cats,to,'var(--out)')}</div></div>
+  <div class="panel"><h3>Recouvrement par classe (1re tranche)</h3>${cl.map(c=>`<div class="row"><span>${c[0]}</span><div class="bar"><i style="width:${c[3]}%"></i></div><span class="r">${Math.round(c[3])} % · ${F(c[1])}</span></div>`).join('')}</div>`}
+
+function inv(id){
+  const x=tx.find(t=>t.id===id);if(!x)return;const s=x.eleve&&students.find(q=>q.id===x.eleve),n=('0000'+x.id).slice(-4),out=x.type==='out';
+  const reste=s&&x.cat==='Scolarité'?total(s)-sum(tx.filter(t=>t.eleve===s.id&&t.cat==='Scolarité'&&t.id<=x.id).map(t=>t.amount)):null;
+  $('inv').innerHTML=`<div class="invh"><div><b style="font-size:18px">Établissement scolaire</b><br>Abidjan, Côte d’Ivoire</div><div style="text-align:right"><b>${out?'BON DE SORTIE':'FACTURE'}</b><br>N° ${out?'BS':'FAC'}-2026-${n}<br>Date : ${fmtDate(x.date)}</div></div>
+  ${s?`<p><b>Élève :</b> ${s.nom}<br><b>Classe :</b> ${s.classe} · <b>Matricule :</b> ${s.mat}<br><b>Tuteur :</b> ${s.tuteur}</p>`:''}
+  <table><thead><tr><th>Désignation</th><th>Catégorie</th><th class="r">Montant</th></tr></thead><tbody><tr><td style="white-space:normal">${x.label}</td><td>${x.cat}</td><td class="r">${F(x.amount)}</td></tr></tbody></table>
+  <p style="text-align:right;font-size:17px"><b>Total : ${F(x.amount)}</b></p>
+  <p>Mode de paiement : ${x.mode}${x.mois&&x.mois.length?'<br>Mois couverts : '+x.mois.map(m=>MONTHS[MK.indexOf(m)]).join(', '):''}${reste!==null?'<br>Reste de la scolarité annuelle : '+F(reste):''}</p>
+  <div class="sig"><span>${out?'Le bénéficiaire':'Le parent ou payeur'}</span><span>Cachet et signature de l’économe</span></div>`;$('dlgInv').showModal()}
+$('btnPrint').onclick=()=>{try{window.print()}catch(e){toast('Impression indisponible ici')}};
+function services(){
+  const rows=[];let tot=0;
+  students.forEach(s=>SK.forEach(([k,c])=>{if(!s[k])return;const p=pm(s,c),lt=svLate(s,k,c),am=lt.length*TAR[k];tot+=am;
+    rows.push(`<tr><td>${s.nom}</td><td>${s.classe}</td><td>${c}</td><td><span style="display:flex;gap:3px">${MK.map((m,i)=>`<span class="badge ${p.has(m)?'b-ok':lt.includes(m)?'b-late':''}" style="${p.has(m)||lt.includes(m)?'':'background:var(--bg);color:var(--mute)'}">${MONTHS[i]}</span>`).join('')}</span></td><td class="r ${am?'out':''}">${am?F(am):'—'}</td><td class="r">${am?`<button class="btn sm" data-svc="${s.id}" data-cat="${c}">Encaisser</button>`:''}</td></tr>`)}));
+  return `<h2>Cantine et transport</h2><p class="sub">Abonnements mensuels aux tarifs par défaut · ${F(tot)} d’impayés jusqu’en octobre</p>
+  <div class="panel tw"><table><thead><tr><th>Élève</th><th>Classe</th><th>Service</th><th>Mois (vert : payé, rouge : en retard)</th><th class="r">Retard</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
+function tarifs(){
+  const f=(id,l,v)=>`<label for="${id}">${l}</label><input id="${id}" type="number" min="0" step="500" value="${v}" data-tar>`;
+  return `<h2>Tarifs</h2><p class="sub">Ces prix sont proposés par défaut à l’encaissement. Tu peux les modifier ici.</p>
+  <div class="cols"><div class="panel"><h3>Services</h3>${f('tCan','Cantine (par mois, en FCFA)',TAR.cantine)}${f('tTra','Transport (par mois, en FCFA)',TAR.transport)}${f('tIns','Frais d’inscription (en FCFA)',TAR.inscription)}</div>
+  <div class="panel"><h3>Scolarité annuelle</h3>${Object.keys(FEES).map(c=>f('fee'+c,'Classe de '+c+' (en FCFA)',FEES[c])).join('')}</div></div>`}
+const IC={dash:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+caisse:'<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 13h.01"/>',
+eleves:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+fees:'<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+bus:'<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 11h20M8 4v7M16 4v7"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/>',
+rap:'<path d="M3 3v18h18"/><path d="M8 17v-6M13 17V7M18 17v-4"/>',
+tag:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+up:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>',
+alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',plus:'<path d="M12 5v14M5 12h14"/>',
+print:'<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M8 8h8M8 12h8"/>',
+userplus:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>'};
+const ic=(n,s=18)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none">${IC[n]}</svg>`;
+const NAVI={dash:'dash',caisse:'caisse',eleves:'eleves',fees:'fees',services:'bus',rap:'rap',tarifs:'tag'};
+document.querySelectorAll('nav button').forEach(b=>b.insertAdjacentHTML('afterbegin',ic(NAVI[b.dataset.v])));
+$('btnPrint').insertAdjacentHTML('afterbegin',ic('print',16));
+function eleveRows(){
+  const l=students.filter(s=>(cf==='all'||s.classe===cf)&&s.nom.toLowerCase().includes(q.toLowerCase()));
+  if(!l.length)return '<tr><td colspan="6" class="empty">Aucun élève ne correspond à cette recherche.</td></tr>';
+  return l.map(s=>{const st=status(s),sv=[s.cantine&&'Cantine',s.transport&&'Transport'].filter(Boolean).join(', ')||'—';return `<tr><td><button class="btn ghost sm" data-sel="${s.id}">${s.nom}</button></td><td>${s.classe}</td><td>${s.mat}</td><td>${s.tuteur}</td><td>${sv}</td><td><span class="badge ${st[1]}">${st[0]}</span></td></tr>`}).join('')}
+function eleves(){
+  if(sel){const s=students.find(x=>x.id===sel),st=status(s),ops=tx.filter(x=>x.eleve===s.id).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  return `<button class="btn ghost sm" data-back>← Retour à la liste</button>
+  <div class="head" style="margin-top:12px"><div><h2>${s.nom}</h2><p class="sub">${s.mat} · ${s.classe} · <span class="badge ${st[1]}">${st[0]}</span></p></div><button class="btn" data-act="newTx" data-eleve="${s.id}">Enregistrer un paiement</button></div>
+  <div class="kpis"><div class="kpi"><span>Scolarité annuelle</span><b>${F(total(s))}</b></div><div class="kpi"><span>Déjà payé</span><b class="in">${F(paid(s))}</b></div><div class="kpi"><span>Reste à payer</span><b class="${rest(s)?'out':''}">${F(rest(s))}</b></div></div>
+  <div class="cols"><div class="panel"><h3>Historique des paiements</h3>${ops.length?`<div class="tw"><table><tbody>${ops.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.cat}</td><td>${x.mode}</td><td class="r in">+${F(x.amount)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="empty">Aucun paiement enregistré.</p>'}</div>
+  <div class="panel"><h3>Fiche de l’élève</h3><p style="margin:0 0 8px">Inscription : ${insPaid(s)?'payée':'à payer'}<br>Tuteur : ${s.tuteur}<br>Téléphone : ${s.tel}</p><p style="margin:0">Cantine : ${s.cantine?'oui · '+svLate(s,'cantine','Cantine').length+' mois en retard':'non'}<br>Transport : ${s.transport?'oui · '+svLate(s,'transport','Transport').length+' mois en retard':'non'}</p></div></div>`}
+  return `<div class="head"><div><h2>Élèves</h2><p class="sub">${students.length} élèves inscrits en 2026–2027</p></div><button class="btn" data-act="newEleve">${ic('userplus',16)}Inscrire un élève</button></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><input id="qs" placeholder="Rechercher un élève" value="${q}" style="max-width:260px" aria-label="Rechercher un élève"><select id="cs" style="max-width:180px" aria-label="Filtrer par classe"><option value="all">Toutes les classes</option>${Object.keys(FEES).map(c=>`<option ${cf===c?'selected':''}>${c}</option>`).join('')}</select></div>
+  <div class="panel tw"><table><thead><tr><th>Élève</th><th>Classe</th><th>Matricule</th><th>Tuteur</th><th>Services</th><th>Scolarité</th></tr></thead><tbody id="tb">${eleveRows()}</tbody></table></div>`}
+function render(){
+  $('main').innerHTML={dash,caisse,fees,services,eleves,rap,tarifs}[view]();
+  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.v===view?'page':'false'));
+}
+document.querySelector('nav').onclick=e=>{const b=e.target.closest('button');if(b){view=b.dataset.v;sel=null;render();scrollTo(0,0)}};
+let payId=null;
+$('main').onclick=e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.f){filter=t.dataset.f;render()}
+  if(t.dataset.act==='newTx'){fillCats();if(t.dataset.eleve){$('tEleve').value=t.dataset.eleve;hint()}$('dlgTx').showModal()}
+  if(t.dataset.act==='newEleve')$('dlgEleve').showModal();
+  if(t.dataset.inv)inv(+t.dataset.inv);
+  if(t.dataset.svc){$('tType').value='in';fillCats();$('tCat').value=t.dataset.cat;sync();$('tEleve').value=t.dataset.svc;hint();$('dlgTx').showModal()}
+  if(t.dataset.sel){sel=+t.dataset.sel;render();scrollTo(0,0)}
+  if(t.hasAttribute('data-back')){sel=null;render()}
+  if(t.dataset.pay){const s=students.find(x=>x.id==t.dataset.pay);payId=s.id;$('pTitle').textContent='Encaisser — '+s.nom;
+    $('pInfo').textContent='Reste annuel : '+F(rest(s))+(late(s)?' · dont retard : '+F(late(s)):'');$('pAmt').value=late(s)||Math.min(rest(s),50000);$('dlgPay').showModal()}
+};
+const STU_CATS=['Scolarité','Inscription','Cantine','Transport'];
+function fillCats(){const o=$('tType').value==='in'?CATS_IN:CATS_OUT;$('tCat').innerHTML=o.map(c=>`<option>${c}</option>`).join('');sync()}
+function sync(){const st=$('tType').value==='in'&&STU_CATS.includes($('tCat').value);$('wEleve').style.display=st?'':'none';$('wLab').style.display=st?'none':'';$('wMois').style.display='none';
+  if(st){const cur=$('tEleve').value;const ca=$('tCat').value,l=students.filter(s=>ca==='Inscription'?!insPaid(s):ca==='Scolarité'?rest(s)>0:true);$('tEleve').innerHTML=l.length?l.map(s=>`<option value="${s.id}">${s.nom} (${s.classe})</option>`).join(''):'<option value="">Aucun élève à encaisser</option>';if(l.some(s=>s.id==cur))$('tEleve').value=cur;hint()}}
+function hint(){const s=students.find(x=>x.id==$('tEleve').value);if(!s){$('tHint').textContent='Tous les élèves sont à jour pour cette catégorie.';$('wMois').style.display='none';return}const ca=$('tCat').value,k=ca.toLowerCase(),sv=ca==='Cantine'||ca==='Transport',h=$('tHint');
+  $('wMois').style.display=sv?'':'none';
+  if(ca==='Scolarité'){h.textContent='Reste annuel : '+F(rest(s))+(late(s)?' · retard : '+F(late(s)):'');if(late(s))$('tAmt').value=late(s)}
+  else if(ca==='Inscription'){h.textContent='Tarif par défaut : '+F(TAR.inscription);$('tAmt').value=TAR.inscription}
+  else if(sv){const p=pm(s,ca),lt=svLate(s,k,ca);h.textContent=(s[k]?'':'Cet élève n’est pas encore abonné : il le sera à l’enregistrement. ')+'Tarif par défaut : '+F(TAR[k])+' par mois';
+    $('tMois').innerHTML=MK.map((m,i)=>`<label style="display:flex;gap:4px;align-items:center;margin:0;color:var(--ink)"><input type="checkbox" value="${m}" style="width:auto" ${p.has(m)?'checked disabled':lt.includes(m)?'checked':''}>${MONTHS[i]}</label>`).join('');moisAmt()}
+  else h.textContent=''}
+function moisAmt(){const ca=$('tCat').value;$('tAmt').value=TAR[ca.toLowerCase()]*$('tMois').querySelectorAll('input:checked:not(:disabled)').length||''}
+$('tMois').onchange=moisAmt;
+$('tCat').onchange=sync;$('tEleve').onchange=hint;
+$('tType').onchange=fillCats;
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+$('fTx').onsubmit=e=>{const ty=$('tType').value,ca=$('tCat').value,am=+$('tAmt').value,mo=$('tMode').value;
+  if(ty==='in'&&STU_CATS.includes(ca)){const s=students.find(x=>x.id==$('tEleve').value);
+    if(!s){e.preventDefault();toast('Aucun élève à encaisser pour cette catégorie');return}if(ca==='Scolarité'){const a=Math.min(am,rest(s));if(a<=0){e.preventDefault();toast('Cet élève a déjà soldé sa scolarité');return}s.pays.push([TODAY,a]);add(TODAY,ty,ca,ca+' — '+s.nom,a,mo,s.id)}
+    else{const sv=ca==='Cantine'||ca==='Transport',ms=sv?[...$('tMois').querySelectorAll('input:checked:not(:disabled)')].map(i=>i.value):[];if(sv&&!ms.length){e.preventDefault();toast('Coche au moins un mois');return}add(TODAY,ty,ca,ca+' — '+s.nom+(ms.length?' ('+ms.length+' mois)':''),am,mo,s.id,ms);if(sv)s[ca.toLowerCase()]=true}}
+  else{if(!$('tLab').value.trim()){e.preventDefault();toast('Saisis un libellé');return}add(TODAY,ty,ca,$('tLab').value,am,mo)}
+  $('fTx').reset();toast('Opération enregistrée');render();inv(tid-1)};
+$('fPay').onsubmit=()=>{const s=students.find(x=>x.id===payId),a=Math.min(+$('pAmt').value,rest(s));
+  s.pays.push([TODAY,a]);add(TODAY,'in','Scolarité','Scolarité — '+s.nom,a,$('pMode').value,s.id);toast('Paiement de '+F(a)+' encaissé');render();inv(tid-1)};
+$('fEl').onsubmit=()=>{const id=students.length+1;students.push({id,nom:$('eNom').value.trim(),classe:$('eCl').value,pays:[],mat:'2026-'+String(id).padStart(3,'0'),tuteur:$('eTut').value.trim(),tel:$('eTel').value,cantine:$('eCa').checked,transport:$('eTr').checked});$('fEl').reset();toast('Élève inscrit');render()};
+$('main').oninput=e=>{if(e.target.id==='qs'){q=e.target.value;$('tb').innerHTML=eleveRows()}};
+$('main').onchange=e=>{if(e.target.id==='cs'){cf=e.target.value;$('tb').innerHTML=eleveRows()}
+  if(e.target.hasAttribute('data-tar')){const v=+e.target.value||0,id=e.target.id;if(id==='tCan')TAR.cantine=v;else if(id==='tTra')TAR.transport=v;else if(id==='tIns')TAR.inscription=v;else FEES[id.slice(3)]=v;toast('Tarif mis à jour')}};
+render();
+</script>
+</body>
+</html>
